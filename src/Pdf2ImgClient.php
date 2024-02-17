@@ -20,7 +20,7 @@ use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
 
-final class Pdf2ImgClient
+class Pdf2ImgClient
 {
     public function __construct(
         private readonly string $baseUrl,
@@ -61,7 +61,7 @@ final class Pdf2ImgClient
         try {
             $response = $this->client->sendRequest(
                 $this->requestFactory
-                    ->createRequest("POST", "$this->baseUrl/convert")
+                    ->createRequest("POST", $this->getConvertEndpointUri())
                     ->withHeader(
                         "Content-Type",
                         "multipart/form-data; boundary={$multipartStreamBuilder->getBoundary()}"
@@ -109,5 +109,14 @@ final class Pdf2ImgClient
     private function createStreamBuilder(): MultipartStreamBuilder
     {
         return new MultipartStreamBuilder($this->streamFactory);
+    }
+
+    private function getConvertEndpointUri(): string
+    {
+        $url = $this->baseUrl;
+        if (!str_ends_with($url, '/')) {
+            $url .= '/';
+        }
+        return "{$url}convert";
     }
 }
