@@ -11,6 +11,11 @@ declare(strict_types=1);
 
 namespace CodeInc\Pdf2ImgClient;
 
+/**
+ * pdf2img convert options.
+ *
+ * @see https://github.com/codeinchq/pdf2img?tab=readme-ov-file#usage
+ */
 final readonly class ConvertOptions
 {
     public function __construct(
