@@ -93,7 +93,7 @@ class Pdf2ImgClient
      * @return StreamInterface
      * @throws Exception
      */
-    public function convertLocalFile(string $pdfPath, ConvertOptions $options): StreamInterface
+    public function convertLocalFile(string $pdfPath, ConvertOptions $options = new ConvertOptions()): StreamInterface
     {
         $f = fopen($pdfPath, 'r');
         if ($f === false) {
