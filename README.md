@@ -40,7 +40,6 @@ With options:
 ```php
 use CodeInc\Pdf2ImgClient\Pdf2ImgClient;
 use CodeInc\Pdf2ImgClient\ConvertOptions;
-$client = new Pdf2ImgClient('https://pdf2img.codeinc.co');
 
 $apiBaseUri = 'http://localhost:3000/';
 $localPdfPath = '/path/to/local/file.pdf';
