@@ -58,7 +58,7 @@ final class Pdf2ImgClientTest extends TestCase
     {
         return new ConvertOptions(
             format: 'jpeg',
-            page: 0,
+            page: 1,
             density: 72,
             height: 300,
             width: 300,

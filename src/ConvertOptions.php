@@ -20,7 +20,7 @@ final readonly class ConvertOptions
 {
     public function __construct(
         public string $format = 'webp',
-        public int $page = 0,
+        public int $page = 1,
         public int $density = 300,
         public int $height = 1000,
         public int $width = 1000,
