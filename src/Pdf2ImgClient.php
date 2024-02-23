@@ -20,6 +20,14 @@ use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
 
+/**
+ * PDF2IMG client.
+ *
+ * @package CodeInc\Pdf2ImgClien
+ * @link https://github.com/codeinchq/pdf2img-php-client
+ * @link https://github.com/codeinchq/pdf2img
+ * @license https://opensource.org/licenses/MIT MIT
+ */
 class Pdf2ImgClient
 {
     public function __construct(
