@@ -15,7 +15,8 @@ use Exception as BaseException;
 
 class Exception extends BaseException
 {
-    public const ERROR_LOCAL_FILE = 100;
+    public const ERROR_FILE_OPEN = 100;
+    public const ERROR_FILE_WRITE = 110;
     public const ERROR_REQUEST = 200;
     public const ERROR_RESPONSE = 300;
 }

@@ -17,6 +17,14 @@ use CodeInc\Pdf2ImgClient\Pdf2ImgClient;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
 
+/**
+ * Class Pdf2ImgClientTest
+ *
+ * @see Pdf2ImgClient
+ * @package CodeInc\Pdf2ImgClient\Tests
+ * @license https://opensource.org/licenses/MIT MIT
+ * @author Joan Fabrégat <joan@codeinc.co>
+ */
 final class Pdf2ImgClientTest extends TestCase
 {
     private const DEFAULT_PDF2IMG_BASE_URL = 'http://localhost:3000';
@@ -26,45 +34,56 @@ final class Pdf2ImgClientTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testConvertLocalFile(): void
+    public function testConvert(): void
     {
-        $this->assertIsValidResponseStream(
-            $this->getClient()->convertLocalFile(self::TEST_PDF_PATH, $this->getOptions())
-        );
+        $client = $this->getNewClient();
+        $stream = $client->convert($client->createStreamFromFile(self::TEST_PDF_PATH));
+        $this->assertInstanceOf(StreamInterface::class, $stream, "The stream is not valid");
+
+        $imageContent = (string)$stream;
+        $this->assertStringContainsString('WEBP', $imageContent, "The image is not a WEBP");
     }
 
     /**
      * @throws Exception
      */
-    public function testConvert(): void
+    public function testConvertWithOptions(): void
     {
-        $stream = fopen(self::TEST_PDF_PATH, 'r');
-        $this->assertIsResource($stream);
-        $this->assertIsValidResponseStream(
-            $this->getClient()->convert($stream, $this->getOptions())
+        $this->assertIsWritable(dirname(self::TEST_PDF_RESULT_IMG), "The result file is not writable");
+
+        $client = $this->getNewClient();
+        $stream = $client->convert(
+            $client->createStreamFromFile(self::TEST_PDF_PATH),
+            new ConvertOptions(
+                format: 'jpeg',
+                page: 1,
+                density: 72,
+                height: 300,
+                width: 300,
+                background: 'white',
+                quality: 80,
+            )
         );
+        $this->assertInstanceOf(StreamInterface::class, $stream, "The stream is not valid");
+
+        $client->saveStreamToFile($stream, self::TEST_PDF_RESULT_IMG);
+        $this->assertFileExists(self::TEST_PDF_RESULT_IMG, "The result file does not exist");
+        $this->assertStringContainsString(
+            'JFIF',
+            file_get_contents(self::TEST_PDF_RESULT_IMG),
+            "The image is not valid"
+        );
+
+        unlink(self::TEST_PDF_RESULT_IMG);
     }
 
-    private function getClient(): Pdf2ImgClient
+    private function getNewClient(): Pdf2ImgClient
     {
         $apiBaseUrl = self::DEFAULT_PDF2IMG_BASE_URL;
         if (defined('PDF2IMG_BASE_URL')) {
             $apiBaseUrl = constant('PDF2IMG_BASE_URL');
         }
         return new Pdf2ImgClient($apiBaseUrl);
-    }
-
-    private function getOptions(): ConvertOptions
-    {
-        return new ConvertOptions(
-            format: 'jpeg',
-            page: 1,
-            density: 72,
-            height: 300,
-            width: 300,
-            background: 'white',
-            quality: 80,
-        );
     }
 
     private function assertIsValidResponseStream(mixed $stream): void

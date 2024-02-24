@@ -27,6 +27,7 @@ use Psr\Http\Message\StreamInterface;
  * @link https://github.com/codeinchq/pdf2img-php-client
  * @link https://github.com/codeinchq/pdf2img
  * @license https://opensource.org/licenses/MIT MIT
+ * @author Joan Fabrégat <joan@codeinc.co>
  */
 class Pdf2ImgClient
 {
@@ -49,7 +50,7 @@ class Pdf2ImgClient
      */
     public function convert(mixed $stream, ConvertOptions $options = new ConvertOptions()): StreamInterface
     {
-        $multipartStreamBuilder = $this->createStreamBuilder()
+        $multipartStreamBuilder = (new MultipartStreamBuilder($this->streamFactory))
             ->addResource(
                 'file',
                 $stream,
@@ -96,27 +97,43 @@ class Pdf2ImgClient
     }
 
     /**
-     * @param string $pdfPath
-     * @param ConvertOptions $options
+     * Opens a local file and creates a stream from it.
+     *
+     * @param string $path The path to the file.
+     * @param string $openMode The mode used to open the file.
      * @return StreamInterface
      * @throws Exception
      */
-    public function convertLocalFile(string $pdfPath, ConvertOptions $options = new ConvertOptions()): StreamInterface
+    public function createStreamFromFile(string $path, string $openMode = 'r'): StreamInterface
     {
-        $f = fopen($pdfPath, 'r');
+        $f = fopen($path, $openMode);
         if ($f === false) {
-            throw new Exception(
-                message: "The file '$pdfPath' could not be opened",
-                code: Exception::ERROR_LOCAL_FILE
-            );
+            throw new Exception("The file '$path' could not be opened", Exception::ERROR_FILE_OPEN);
         }
 
-        return $this->convert($f, $options);
+        return $this->streamFactory->createStreamFromResource($f);
     }
 
-    private function createStreamBuilder(): MultipartStreamBuilder
+    /**
+     * Saves a stream to a local file.
+     *
+     * @param StreamInterface $stream
+     * @param string $path The path to the file.
+     * @param string $openMode The mode used to open the file.
+     * @throws Exception
+     */
+    public function saveStreamToFile(StreamInterface $stream, string $path, string $openMode = 'w'): void
     {
-        return new MultipartStreamBuilder($this->streamFactory);
+        $f = fopen($path, $openMode);
+        if ($f === false) {
+            throw new Exception("The file '$path' could not be opened", Exception::ERROR_FILE_OPEN);
+        }
+
+        if (stream_copy_to_stream($stream->detach(), $f) === false) {
+            throw new Exception("The stream could not be copied to the file '$path'", Exception::ERROR_FILE_WRITE);
+        }
+
+        fclose($f);
     }
 
     private function getConvertEndpointUri(): string

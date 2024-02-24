@@ -23,11 +23,14 @@ $apiBaseUri = 'http://localhost:3000/';
 $localPdfPath = '/path/to/local/file.pdf';
 
 try {
-    # convert 
     $client = new Pdf2ImgClient($apiBaseUri);
-    $image = $client->convertLocalFile($localPdfPath);
+
+    // convert 
+    $image = $client->convert(
+        $client->createStreamFromFile($localPdfPath)
+    );
     
-    # display the image 
+    // display the image 
     header('Content-Type: image/webp');
     echo (string)$image;
 }
@@ -55,14 +58,16 @@ $convertOption = new ConvertOptions(
 );
 
 try {
-    # convert 
     $client = new Pdf2ImgClient($apiBaseUri);
-    $image = $client->convertLocalFile($localPdfPath, $convertOption);
+
+    // convert 
+    $image = $client->convertLocalFile(
+        $client->createStreamFromFile($localPdfPath),
+        $convertOption
+     );
     
-    # saves the image to a file 
-    $f = fopen($destinationPath, 'w');
-    stream_copy_to_stream($image->detach(), $f);
-    fclose($f);
+    // saves the image to a file 
+    $client->saveStreamToFile($image, $destinationPath);
 }
 catch (Exception $e) {
     // handle exception
