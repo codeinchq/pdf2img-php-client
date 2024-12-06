@@ -29,7 +29,7 @@ final class Pdf2ImgClientTest extends TestCase
 {
     private const DEFAULT_PDF2IMG_BASE_URL = 'http://localhost:3000';
     private const TEST_PDF_PATH = __DIR__.'/assets/file.pdf';
-    private const TEST_PDF_RESULT_IMG = __DIR__.'/assets/file.jpg';
+    private const TEST_PDF_RESULT_IMG = '/tmp/file.jpg';
 
     public function testHealth(): void
     {
@@ -81,7 +81,7 @@ final class Pdf2ImgClientTest extends TestCase
         );
         $this->assertInstanceOf(StreamInterface::class, $stream, "The stream is not valid");
 
-        $f = fopen(self::TEST_PDF_RESULT_IMG, 'r+');
+        $f = fopen(self::TEST_PDF_RESULT_IMG, 'w+');
         self::assertNotFalse($f, "The test file could not be opened");
 
         $r = stream_copy_to_stream($stream->detach(), $f);
