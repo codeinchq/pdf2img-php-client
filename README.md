@@ -1,4 +1,4 @@
-# pdf2img PHP client
+# Pdf2Img PHP client
 
 This repository contains a PHP 8.2+ library for converting PDF files to images using the [pdf2img](https://github.com/codeinchq/pdf2img) service.
 
