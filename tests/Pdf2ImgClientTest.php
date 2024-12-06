@@ -31,6 +31,21 @@ final class Pdf2ImgClientTest extends TestCase
     private const TEST_PDF_PATH = __DIR__.'/assets/file.pdf';
     private const TEST_PDF_RESULT_IMG = __DIR__.'/assets/file.jpg';
 
+    public function testHealth(): void
+    {
+        // testing a healthy service
+        $client = $this->getNewClient();
+        $this->assertNotFalse($client->checkServiceHealth(), "The service is not healthy.");
+
+        // testing a non-existing service
+        $client = new Pdf2ImgClient('https://example.com');
+        $this->assertFalse($client->checkServiceHealth(), "The service is healthy.");
+
+        // testing a non-existing url
+        $client = new Pdf2ImgClient('https://example-NQrkB6F6MwuXesMrBhqx.com');
+        $this->assertFalse($client->checkServiceHealth(), "The service is healthy.");
+    }
+
     /**
      * @throws Exception
      */
