@@ -9,10 +9,12 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      PDF2IMG_BASE_URL: http://pdf2img:3000
 
     services:
       # Define the Docker service
-      db:
+      pdf2img:
         image: codeinchq/pdf2img:latest
         ports:
           - 3000:3000
