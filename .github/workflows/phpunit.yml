@@ -14,9 +14,6 @@ jobs:
       # Define the Docker service
       db:
         image: codeinchq/pdf2img:latest
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: testdb
         ports:
           - 3000:3000
 
@@ -38,4 +35,4 @@ jobs:
 
       # Run tests
       - name: Run tests
-        run: vendor/bin/phpunit
+        run: vendor/bin/phpunit tests
