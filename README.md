@@ -1,5 +1,7 @@
 # Pdf2Img PHP client
 
+![Tests](https://github.com/codeinchq/pdf2img-php-client/actions/workflows/phpunit.yml/badge.svg)
+
 This repository contains a PHP 8.2+ library for converting PDF files to images using the [pdf2img](https://github.com/codeinchq/pdf2img) service.
 
 ## Installation
