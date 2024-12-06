@@ -4,7 +4,7 @@ This repository contains a PHP 8.2+ library for converting PDF files to images u
 
 ## Installation
 
-The recommended way to install the library is through [Composer](http://getcomposer.org):
+The library is available on [Packagist](https://packagist.org/packages/codeinc/pdf2img-client). The recommended way to install it is via Composer:
 
 ```bash
 composer require codeinc/pdf2img-client
