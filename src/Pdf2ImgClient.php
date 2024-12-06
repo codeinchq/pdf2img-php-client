@@ -21,25 +21,29 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
 
 /**
- * PDF2IMG client.
+ * Client to interact with the Pdf2Img API.
  *
  * @package CodeInc\Pdf2ImgClien
- * @link https://github.com/codeinchq/pdf2img-php-client
- * @link https://github.com/codeinchq/pdf2img
+ * @link    https://github.com/codeinchq/pdf2img-php-client
+ * @link    https://github.com/codeinchq/pdf2img
  * @license https://opensource.org/licenses/MIT MIT
- * @author Joan Fabrégat <joan@codeinc.co>
+ * @author  Joan Fabrégat <joan@codeinc.co>
  */
 class Pdf2ImgClient
 {
+    public ClientInterface $client;
+    public StreamFactoryInterface $streamFactory;
+    public RequestFactoryInterface $requestFactory;
+
     public function __construct(
         private readonly string $baseUrl,
-        private ClientInterface|null $client = null,
-        private StreamFactoryInterface|null $streamFactory = null,
-        private RequestFactoryInterface|null $requestFactory = null,
+        ClientInterface|null $client = null,
+        StreamFactoryInterface|null $streamFactory = null,
+        RequestFactoryInterface|null $requestFactory = null,
     ) {
-        $this->client ??= Psr18ClientDiscovery::find();
-        $this->streamFactory ??= Psr17FactoryDiscovery::findStreamFactory();
-        $this->requestFactory ??= Psr17FactoryDiscovery::findRequestFactory();
+        $this->client = $client ?? Psr18ClientDiscovery::find();
+        $this->streamFactory = $streamFactory ?? Psr17FactoryDiscovery::findStreamFactory();
+        $this->requestFactory = $requestFactory ?? Psr17FactoryDiscovery::findRequestFactory();
     }
 
     /**
@@ -94,46 +98,6 @@ class Pdf2ImgClient
         }
 
         return $response->getBody();
-    }
-
-    /**
-     * Opens a local file and creates a stream from it.
-     *
-     * @param string $path The path to the file.
-     * @param string $openMode The mode used to open the file.
-     * @return StreamInterface
-     * @throws Exception
-     */
-    public function createStreamFromFile(string $path, string $openMode = 'r'): StreamInterface
-    {
-        $f = fopen($path, $openMode);
-        if ($f === false) {
-            throw new Exception("The file '$path' could not be opened", Exception::ERROR_FILE_OPEN);
-        }
-
-        return $this->streamFactory->createStreamFromResource($f);
-    }
-
-    /**
-     * Saves a stream to a local file.
-     *
-     * @param StreamInterface $stream
-     * @param string $path The path to the file.
-     * @param string $openMode The mode used to open the file.
-     * @throws Exception
-     */
-    public function saveStreamToFile(StreamInterface $stream, string $path, string $openMode = 'w'): void
-    {
-        $f = fopen($path, $openMode);
-        if ($f === false) {
-            throw new Exception("The file '$path' could not be opened", Exception::ERROR_FILE_OPEN);
-        }
-
-        if (stream_copy_to_stream($stream->detach(), $f) === false) {
-            throw new Exception("The stream could not be copied to the file '$path'", Exception::ERROR_FILE_WRITE);
-        }
-
-        fclose($f);
     }
 
     private function getConvertEndpointUri(): string

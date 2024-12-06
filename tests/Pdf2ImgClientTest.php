@@ -20,10 +20,10 @@ use Psr\Http\Message\StreamInterface;
 /**
  * Class Pdf2ImgClientTest
  *
- * @see Pdf2ImgClient
+ * @see     Pdf2ImgClient
  * @package CodeInc\Pdf2ImgClient\Tests
  * @license https://opensource.org/licenses/MIT MIT
- * @author Joan Fabrégat <joan@codeinc.co>
+ * @author  Joan Fabrégat <joan@codeinc.co>
  */
 final class Pdf2ImgClientTest extends TestCase
 {
@@ -37,7 +37,7 @@ final class Pdf2ImgClientTest extends TestCase
     public function testConvert(): void
     {
         $client = $this->getNewClient();
-        $stream = $client->convert($client->createStreamFromFile(self::TEST_PDF_PATH));
+        $stream = $client->convert($client->streamFactory->createStreamFromFile(self::TEST_PDF_PATH));
         $this->assertInstanceOf(StreamInterface::class, $stream, "The stream is not valid");
 
         $imageContent = (string)$stream;
@@ -53,7 +53,7 @@ final class Pdf2ImgClientTest extends TestCase
 
         $client = $this->getNewClient();
         $stream = $client->convert(
-            $client->createStreamFromFile(self::TEST_PDF_PATH),
+            $client->streamFactory->createStreamFromFile(self::TEST_PDF_PATH),
             new ConvertOptions(
                 format: 'jpeg',
                 page: 1,
@@ -66,7 +66,12 @@ final class Pdf2ImgClientTest extends TestCase
         );
         $this->assertInstanceOf(StreamInterface::class, $stream, "The stream is not valid");
 
-        $client->saveStreamToFile($stream, self::TEST_PDF_RESULT_IMG);
+        $f = fopen(self::TEST_PDF_RESULT_IMG, 'r+');
+        self::assertNotFalse($f, "The test file could not be opened");
+
+        $r = stream_copy_to_stream($stream->detach(), $f);
+        self::assertNotFalse($r, "The stream could not be copied to the test file");
+
         $this->assertFileExists(self::TEST_PDF_RESULT_IMG, "The result file does not exist");
         $this->assertStringContainsString(
             'JFIF',
@@ -84,13 +89,5 @@ final class Pdf2ImgClientTest extends TestCase
             $apiBaseUrl = constant('PDF2IMG_BASE_URL');
         }
         return new Pdf2ImgClient($apiBaseUrl);
-    }
-
-    private function assertIsValidResponseStream(mixed $stream): void
-    {
-        $this->assertInstanceOf(StreamInterface::class, $stream, "The stream is not valid");
-        $image = (string)$stream;
-        $this->assertNotEmpty($image, "The stream is empty");
-        $this->assertEquals(md5_file(self::TEST_PDF_RESULT_IMG), md5($image), "The image is not valid");
     }
 }
