@@ -74,7 +74,7 @@ class Pdf2ImgClient
         try {
             $response = $this->client->sendRequest(
                 $this->requestFactory
-                    ->createRequest("POST", $this->getConvertEndpointUri())
+                    ->createRequest("POST", $this->getEndpointUri('/convert'))
                     ->withHeader(
                         "Content-Type",
                         "multipart/form-data; boundary={$multipartStreamBuilder->getBoundary()}"
@@ -100,12 +100,50 @@ class Pdf2ImgClient
         return $response->getBody();
     }
 
-    private function getConvertEndpointUri(): string
+    /**
+     * Returns an endpoint URI.
+     *
+     * @param string $endpoint
+     * @return string
+     */
+    private function getEndpointUri(string $endpoint): string
     {
         $url = $this->baseUrl;
-        if (!str_ends_with($url, '/')) {
-            $url .= '/';
+        if (str_ends_with($url, '/')) {
+            $url = substr($url, 0, -1);
         }
-        return "{$url}convert";
+        if (str_starts_with($endpoint, '/')) {
+            $endpoint = substr($endpoint, 1);
+        }
+
+        return "$url/$endpoint";
+    }
+
+    /**
+     * Health check to verify the service is running.
+     *
+     * @return bool Health check response, expected to be "ok".
+     */
+    public function checkServiceHealth(): bool
+    {
+        try {
+            $response = $this->client->sendRequest(
+                $this->requestFactory->createRequest(
+                    "GET",
+                    $this->getEndpointUri("/health")
+                )
+            );
+
+            // The response status code should be 200
+            if ($response->getStatusCode() !== 200) {
+                return false;
+            }
+
+            // The response body should be {"status":"up"}
+            $responseBody = json_decode((string)$response->getBody(), true);
+            return isset($responseBody['status']) && $responseBody['status'] === 'up';
+        } catch (ClientExceptionInterface) {
+            return false;
+        }
     }
 }
