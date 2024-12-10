@@ -29,14 +29,14 @@ use Psr\Http\Message\StreamInterface;
  * @license https://opensource.org/licenses/MIT MIT
  * @author  Joan Fabrégat <joan@codeinc.co>
  */
-class Pdf2ImgClient
+readonly class Pdf2ImgClient
 {
     public ClientInterface $client;
     public StreamFactoryInterface $streamFactory;
     public RequestFactoryInterface $requestFactory;
 
     public function __construct(
-        private readonly string $baseUrl,
+        private string $baseUrl,
         ClientInterface|null $client = null,
         StreamFactoryInterface|null $streamFactory = null,
         RequestFactoryInterface|null $requestFactory = null,
