@@ -3,6 +3,10 @@
 [![Code Inc.](https://img.shields.io/badge/Code%20Inc.-Pdf2Img-blue)](https://github.com/codeinchq/pdf2img)
 ![Tests](https://github.com/codeinchq/pdf2img-php-client/actions/workflows/phpunit.yml/badge.svg)
 
+> [!IMPORTANT]  
+> This client is deprecated and is replaced by the [Document Cloud PHP Client](https://github.com/codeinchq/document-cloud-php-client)
+
+
 This repository contains a PHP 8.2+ library for converting PDF files to images using the [pdf2img](https://github.com/codeinchq/pdf2img) service.
 
 ## Installation
